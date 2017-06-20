@@ -1,0 +1,15 @@
+@import '../_variables.scss';
+
+.bgc {
+
+  width: $bgc-size;
+  height: $bgc-size;
+  border-radius: 50%;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0px;
+  right: 0px;
+  background-color: black;
+  box-shadow: 0px 0px 20px 1px #000;
+}

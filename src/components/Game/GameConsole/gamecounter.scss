@@ -1,0 +1,22 @@
+.counter-container {
+  width: 65px;
+  position: inherit;
+  top: 50px;
+  left: 35px;
+  text-align: center;
+}
+
+.counter {
+  font-family: "Terminal Dosis";
+  font-size: 40px;
+  line-height: 50px;
+  color: #cc0000;
+  background-color: #000000;
+  box-shadow: inset 0px 0px 3px 1px silver;
+}
+
+.counter-on {
+  @extend .counter;
+  color: #ff0000;
+  text-shadow: 0px 0px 15px #ff0000;
+}

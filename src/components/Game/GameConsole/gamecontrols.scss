@@ -1,0 +1,28 @@
+@import '../../_variables.scss';
+
+.control-container {
+  position: inherit;
+  top: 70px;
+  right: 10px;
+  text-align: center;
+}
+
+.inline {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.switch {
+  width: $btn-offset;
+  height: $btn-offset;
+  border-radius: 50%;
+  outline: none !important;
+  background-color: #cc0000;
+}
+
+.switch-on {
+  @extend .switch;
+  background-color: #ff0000;
+  box-shadow: 0px 0px 5px 1px #ff0000;
+}
