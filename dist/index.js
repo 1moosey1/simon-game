@@ -514,9 +514,7 @@ function updateLink (link, options, obj) {
 "use strict";
 
 
-var _game = __webpack_require__(24);
-
-var _game2 = _interopRequireDefault(_game);
+__webpack_require__(24);
 
 var _GamePiece = __webpack_require__(9);
 
@@ -542,15 +540,15 @@ module.exports = React.createClass({
     },
 
     getPower: function getPower() {
-        return this.state.power;
+        return undefined.state.power;
     },
 
     getStrict: function getStrict() {
-        return this.state.strict;
+        return undefined.state.strict;
     },
 
     getCount: function getCount() {
-        return this.state.count;
+        return undefined.state.count;
     },
 
     togglePower: function togglePower() {
@@ -704,27 +702,18 @@ if(false) {
 "use strict";
 
 
-var _footer = __webpack_require__(19);
+__webpack_require__(19);
 
-var _footer2 = _interopRequireDefault(_footer);
+module.exports = function () {
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-module.exports = React.createClass({
-    displayName: 'exports',
-
-
-    render: function render() {
-
-        return React.createElement(
-            'footer',
-            null,
-            'Code and Design by',
-            React.createElement('br', null),
-            'Juan Gonzalez'
-        );
-    }
-});
+    return React.createElement(
+        'footer',
+        null,
+        'Code and Design by',
+        React.createElement('br', null),
+        'Juan Gonzalez'
+    );
+};
 
 /***/ }),
 /* 6 */
@@ -733,9 +722,7 @@ module.exports = React.createClass({
 "use strict";
 
 
-var _gameconsole = __webpack_require__(20);
-
-var _gameconsole2 = _interopRequireDefault(_gameconsole);
+__webpack_require__(20);
 
 var _GameCounter = __webpack_require__(8);
 
@@ -780,11 +767,7 @@ module.exports = React.createClass({
 "use strict";
 
 
-var _gamecontrols = __webpack_require__(21);
-
-var _gamecontrols2 = _interopRequireDefault(_gamecontrols);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+__webpack_require__(21);
 
 module.exports = React.createClass({
     displayName: "exports",
@@ -834,11 +817,7 @@ module.exports = React.createClass({
 "use strict";
 
 
-var _gamecounter = __webpack_require__(22);
-
-var _gamecounter2 = _interopRequireDefault(_gamecounter);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+__webpack_require__(22);
 
 module.exports = React.createClass({
     displayName: "exports",
@@ -875,11 +854,7 @@ module.exports = React.createClass({
 "use strict";
 
 
-var _gamepiece = __webpack_require__(23);
-
-var _gamepiece2 = _interopRequireDefault(_gamepiece);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+__webpack_require__(23);
 
 module.exports = React.createClass({
     displayName: "exports",
@@ -920,9 +895,7 @@ module.exports = React.createClass({
 "use strict";
 
 
-var _index = __webpack_require__(4);
-
-var _index2 = _interopRequireDefault(_index);
+__webpack_require__(4);
 
 var _Header = __webpack_require__(3);
 

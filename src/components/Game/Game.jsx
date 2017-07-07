@@ -1,4 +1,4 @@
-import styles from './game.scss';
+import './game.scss';
 import GamePiece from './GamePiece/GamePiece.jsx';
 import Console from './GameConsole/GameConsole.jsx';
 
@@ -13,17 +13,14 @@ module.exports = React.createClass({
         };
     },
 
-    getPower: function() {
-        return this.state.power;
-    },
+    getPower: ()=>
+        { return this.state.power; },
 
-    getStrict: function() {
-        return this.state.strict;
-    },
+    getStrict: ()=>
+        { return this.state.strict; },
 
-    getCount: function() {
-        return this.state.count;
-    },
+    getCount: ()=>
+        { return this.state.count; },
 
     togglePower: function() {
 
@@ -70,10 +67,12 @@ module.exports = React.createClass({
     presentPattern: function (pattern) {
 
         var lights = [
+
             document.getElementById("1"),
             document.getElementById("2"),
             document.getElementById("3"),
-            document.getElementById("4")];
+            document.getElementById("4")
+        ];
 
         console.log(this.state.pattern);
 

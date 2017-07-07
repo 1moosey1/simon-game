@@ -1,4 +1,4 @@
-import styles from './gamecontrols.scss';
+import './gamecontrols.scss';
 
 module.exports = React.createClass({
 

@@ -1,4 +1,4 @@
-import styles from './index.scss';
+import './index.scss';
 import Header from './Header/Header.jsx';
 import Game from './Game/Game.jsx';
 

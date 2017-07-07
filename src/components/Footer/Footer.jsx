@@ -1,15 +1,12 @@
-import styles from './footer.scss';
+import './footer.scss';
 
-module.exports = React.createClass({
+module.exports = () => {
 
-    render: function() {
-
-        return (
-            <footer>
-                Code and Design by
-                <br/>
-                Juan Gonzalez
-            </footer>
-        );
-    }
-});
+    return (
+        <footer>
+            Code and Design by
+            <br/>
+            Juan Gonzalez
+        </footer>
+    );
+};

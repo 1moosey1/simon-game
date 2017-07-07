@@ -1,4 +1,4 @@
-import style from './gamecounter.scss';
+import './gamecounter.scss';
 
 module.exports = React.createClass({
 

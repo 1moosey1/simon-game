@@ -1,4 +1,4 @@
-import styles from './gameconsole.scss';
+import './gameconsole.scss';
 import Counter from './GameCounter.jsx';
 import Controls from './GameControls.jsx';
 import Footer from '../../Footer/Footer.jsx';

@@ -1,4 +1,4 @@
-import styles from './gamepiece.scss';
+import './gamepiece.scss';
 
 module.exports = React.createClass({
 
