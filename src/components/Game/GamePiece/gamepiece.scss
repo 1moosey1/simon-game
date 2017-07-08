@@ -1,4 +1,12 @@
 @import '../../_variables.scss';
+$green-off: #006600;
+$green-on: #4ca64c;
+$red-off: #cc0000;
+$red-on: #ff4c4c;
+$yellow-off: #cccc00;
+$yellow-on: #ffff4c;
+$blue-off: #0000cc;
+$blue-on: #4c4cff;
 
 .game-btn {
   width: $btn-size;
@@ -11,14 +19,20 @@
   top: $btn-offset;
   left: $btn-offset;
   border-top-left-radius: 100%;
-  background-color: #006600;
+  background-color: $green-off;
+}
+
+.green-btn-force {
+  @extend .green-btn;
+  background-color: $green-on;
+  box-shadow: 0 0 14px 4px $green-on;
 }
 
 .green-btn-on {
   @extend .green-btn;
   &:active {
-    background-color: #4ca64c;
-    box-shadow: 0px 0px 14px 4px #4ca64c;
+    background-color: $green-on;
+    box-shadow: 0 0 14px 4px $green-on;
   }
 }
 
@@ -27,14 +41,20 @@
   top: $btn-offset;
   right: $btn-offset;
   border-top-right-radius: 100%;
-  background-color: #cc0000;
+  background-color: $red-off;
+}
+
+.red-btn-force {
+  @extend .red-btn;
+  background-color: $red-on;
+  box-shadow: 0 0 14px 4px $red-on;
 }
 
 .red-btn-on {
   @extend .red-btn;
   &:active {
-    background-color: #ff4c4c;
-    box-shadow: 0px 0px 14px 4px #ff4c4c;
+    background-color: $red-on;
+    box-shadow: 0 0 14px 4px $red-on;
   }
 }
 
@@ -43,14 +63,20 @@
   bottom: $btn-offset;
   left: $btn-offset;
   border-bottom-left-radius: 100%;
-  background-color: #cccc00;
+  background-color: $yellow-off;
+}
+
+.yellow-btn-force {
+  @extend .yellow-btn;
+  background-color: $yellow-on;
+  box-shadow: 0 0 14px 4px $yellow-on;
 }
 
 .yellow-btn-on {
   @extend .yellow-btn;
   &:active {
-    background-color: #ffff4c;
-    box-shadow: 0px 0px 14px 4px #ffff4c;
+    background-color: $yellow-on;
+    box-shadow: 0 0 14px 4px $yellow-on;
   }
 }
 
@@ -59,13 +85,19 @@
   bottom: $btn-offset;
   right: $btn-offset;
   border-bottom-right-radius: 100%;
-  background-color: #0000cc;
+  background-color: $blue-off;
+}
+
+.blue-btn-force {
+  @extend .blue-btn;
+  background-color: $blue-on;
+  box-shadow: 0 0 14px 4px $blue-on;
 }
 
 .blue-btn-on {
   @extend .blue-btn;
   &:active {
-    background-color: #4c4cff;
-    box-shadow: 0px 0px 14px 4px #4c4cff;
+    background-color: $blue-on;
+    box-shadow: 0 0 14px 4px $blue-on;
   }
 }

@@ -2,52 +2,109 @@ import './game.scss';
 import GamePiece from './GamePiece/GamePiece.jsx';
 import Console from './GameConsole/GameConsole.jsx';
 
+let audioLink = "https://s3.amazonaws.com/freecodecamp/";
+
 module.exports = React.createClass({
 
+    sounds: [], pattern: [],
+    patternIndex: 0,
+
     getInitialState: function() {
+
+        // When displaying a level's pattern, we use a listener
+        // to indicate when a sound has ended and know to play the next
+        let audioListener = function() {
+
+            // Move to the next button to be displayed
+            this.patternIndex++;
+
+            if(this.state.forceGreen)
+                this.setState({forceGreen: false});
+
+            else if(this.state.forceRed)
+                this.setState({forceRed: false});
+
+            else if(this.state.forceYellow)
+                this.setState({forceYellow: false});
+
+            else if(this.state.forceBlue)
+                this.setState({forceBlue: false});
+
+            // Wait 350 milliseconds before displaying next button
+            // Ensures the displayed pattern isn't shown too fast
+            window.setTimeout(this.displayPattern, 350);
+
+        }.bind(this);
+
+        // Initialize sounds
+        this.sounds = [
+            new Audio(audioLink + "simonSound1.mp3"), // Green sound effect
+            new Audio(audioLink + "simonSound2.mp3"), // Red sound effect
+            new Audio(audioLink + "simonSound3.mp3"), // Yellow sound effect
+            new Audio(audioLink + "simonSound4.mp3")  // Blue sound effect
+        ];
+
+        // Attach listener to each sound
+        this.sounds.forEach((sound)=>{
+            sound.addEventListener("ended", audioListener);
+        });
 
         return {
 
             power: false, strict: false,
-            count: 0, pattern: []
+            forceGreen: false, forceRed: false,
+            forceYellow: false, forceBlue: false,
+            count: 0
         };
     },
 
-    getPower: ()=>
+    getPower: function()
         { return this.state.power; },
 
-    getStrict: ()=>
+    getStrict: function()
         { return this.state.strict; },
 
-    getCount: ()=>
+    getCount: function()
         { return this.state.count; },
 
     togglePower: function() {
 
         if(this.state.power){
 
-            this.resetGame();
-            this.setState({ power: false, strict: false });
+            this.setState({ power: false, strict: false, count: 0 });
         }
-        else
-            this.setState({ power: true }, this.modifyCount);
+        else {
+
+            this.resetGame();
+            this.setState({ power: true, count: 1 }, this.startLevel);
+        }
     },
 
     toggleStrict: function() {
 
         if(this.state.power)
-            this.setState({ strict: !this.getStrict() });
+            this.setState({ strict: !this.state.strict });
     },
 
-    modifyCount: function(count = 1) {
-        this.setState({ count: count }, this.startLevel);
+    // Called when the game pieces are pressed
+    onPress: function(evtObj) {
+
+        // Only play sounds when power is on
+        if(this.state.power) {
+
+            let id = evtObj.target.id;
+            this.sounds[id].pause();
+            this.sounds[id].currentTime = 0;
+            this.sounds[id].play();
+        }
     },
 
     startLevel: function() {
 
-        var pattern, count, i, randBtn;
-        pattern = this.state.pattern;
+        let pattern, count, randBtn;
+        pattern = this.pattern;
 
+        // Determine how many new random buttons need to be added to level's pattern
         count = this.getCount() - pattern.length;
         if (count < 0) {
 
@@ -55,37 +112,45 @@ module.exports = React.createClass({
             count = this.getCount();
         }
 
-        for(i = 0; i < count; ++i) {
+        // Generate and add the new buttons to pattern
+        for(let i = 0; i < count; ++i) {
 
-            randBtn = Math.floor(Math.random() * 4) + 1;
+            randBtn = Math.floor(Math.random() * 4);
             pattern.push(randBtn);
         }
 
-        this.presentPattern(pattern);
+        this.displayPattern();
     },
 
-    presentPattern: function (pattern) {
+    displayPattern: function () {
 
-        var lights = [
+        // If we already displayed entire pattern return and display nothing
+        if(this.patternIndex >= this.pattern.length)
+            return;
 
-            document.getElementById("1"),
-            document.getElementById("2"),
-            document.getElementById("3"),
-            document.getElementById("4")
-        ];
+        // Display next button in the pattern and play associated sound
+        let btnValue = this.pattern[this.patternIndex];
 
-        console.log(this.state.pattern);
+        if(btnValue === 0)
+            this.setState({forceGreen: true});
 
-        for(var i = 0; i < pattern.length; ++i) {
+        else if(btnValue === 1)
+            this.setState({forceRed: true});
 
-            lights[pattern[i] - 1].click();
-        }
+        else if(btnValue === 2)
+            this.setState({forceYellow: true});
+
+        else if(btnValue === 3)
+            this.setState({forceBlue: true});
+
+        this.sounds[btnValue].play();
     },
 
     resetGame: function() {
 
-        this.setState({ count: 0 });
-        this.state.pattern = [];
+        this.setState({ count: 1 });
+        this.pattern = [];
+        this.patternIndex = 0;
     },
 
     render: function() {
@@ -93,17 +158,25 @@ module.exports = React.createClass({
         return (
             <div className="bgc">
 
-                <GamePiece className="green-btn" id="1"
-                           power={this.getPower} />
+                <GamePiece className="green-btn" id="0"
+                           onPress={this.onPress}
+                           power={this.getPower}
+                           forceDisplay={this.state.forceGreen} />
 
-                <GamePiece className="red-btn" id="2"
-                           power={this.getPower} />
+                <GamePiece className="red-btn" id="1"
+                           onPress={this.onPress}
+                           power={this.getPower}
+                           forceDisplay={this.state.forceRed} />
 
-                <GamePiece className="yellow-btn" id="3"
-                           power={this.getPower} />
+                <GamePiece className="yellow-btn" id="2"
+                           onPress={this.onPress}
+                           power={this.getPower}
+                           forceDisplay={this.state.forceYellow} />
 
-                <GamePiece className="blue-btn" id="4"
-                           power={this.getPower} />
+                <GamePiece className="blue-btn" id="3"
+                           onPress={this.onPress}
+                           power={this.getPower}
+                           forceDisplay={this.state.forceBlue} />
 
                 <Console
                     power={this.getPower}

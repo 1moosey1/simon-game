@@ -526,56 +526,102 @@ var _GameConsole2 = _interopRequireDefault(_GameConsole);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var audioLink = "https://s3.amazonaws.com/freecodecamp/";
+
 module.exports = React.createClass({
     displayName: 'exports',
 
 
+    sounds: [], pattern: [],
+    patternIndex: 0,
+
     getInitialState: function getInitialState() {
+
+        // When displaying a level's pattern, we use a listener
+        // to indicate when a sound has ended and know to play the next
+        var audioListener = function () {
+
+            // Move to the next button to be displayed
+            this.patternIndex++;
+
+            if (this.state.forceGreen) this.setState({ forceGreen: false });else if (this.state.forceRed) this.setState({ forceRed: false });else if (this.state.forceYellow) this.setState({ forceYellow: false });else if (this.state.forceBlue) this.setState({ forceBlue: false });
+
+            // Wait 350 milliseconds before displaying next button
+            // Ensures the displayed pattern isn't shown too fast
+            window.setTimeout(this.displayPattern, 350);
+        }.bind(this);
+
+        // Initialize sounds
+        this.sounds = [new Audio(audioLink + "simonSound1.mp3"), // Green sound effect
+        new Audio(audioLink + "simonSound2.mp3"), // Red sound effect
+        new Audio(audioLink + "simonSound3.mp3"), // Yellow sound effect
+        new Audio(audioLink + "simonSound4.mp3") // Blue sound effect
+        ];
+
+        // Attach listener to each sound
+        this.sounds.forEach(function (sound) {
+            sound.addEventListener("ended", audioListener);
+        });
 
         return {
 
             power: false, strict: false,
-            count: 0, pattern: []
+            forceGreen: false, forceRed: false,
+            forceYellow: false, forceBlue: false,
+            count: 0
         };
     },
 
     getPower: function getPower() {
-        return undefined.state.power;
+        return this.state.power;
     },
 
     getStrict: function getStrict() {
-        return undefined.state.strict;
+        return this.state.strict;
     },
 
     getCount: function getCount() {
-        return undefined.state.count;
+        return this.state.count;
     },
 
     togglePower: function togglePower() {
 
         if (this.state.power) {
 
+            this.setState({ power: false, strict: false, count: 0 });
+        } else {
+
             this.resetGame();
-            this.setState({ power: false, strict: false });
-        } else this.setState({ power: true }, this.modifyCount);
+            this.setState({ power: true, count: 1 }, this.startLevel);
+        }
     },
 
     toggleStrict: function toggleStrict() {
 
-        if (this.state.power) this.setState({ strict: !this.getStrict() });
+        if (this.state.power) this.setState({ strict: !this.state.strict });
     },
 
-    modifyCount: function modifyCount() {
-        var count = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    // Called when the game pieces are pressed
+    onPress: function onPress(evtObj) {
 
-        this.setState({ count: count }, this.startLevel);
+        // Only play sounds when power is on
+        if (this.state.power) {
+
+            var id = evtObj.target.id;
+            this.sounds[id].pause();
+            this.sounds[id].currentTime = 0;
+            this.sounds[id].play();
+        }
     },
 
     startLevel: function startLevel() {
 
-        var pattern, count, i, randBtn;
-        pattern = this.state.pattern;
+        var pattern = void 0,
+            count = void 0,
+            randBtn = void 0;
+        pattern = this.pattern;
 
+        // Determine how many new random buttons need to be added to level's pattern
         count = this.getCount() - pattern.length;
         if (count < 0) {
 
@@ -583,31 +629,34 @@ module.exports = React.createClass({
             count = this.getCount();
         }
 
-        for (i = 0; i < count; ++i) {
+        // Generate and add the new buttons to pattern
+        for (var i = 0; i < count; ++i) {
 
-            randBtn = Math.floor(Math.random() * 4) + 1;
+            randBtn = Math.floor(Math.random() * 4);
             pattern.push(randBtn);
         }
 
-        this.presentPattern(pattern);
+        this.displayPattern();
     },
 
-    presentPattern: function presentPattern(pattern) {
+    displayPattern: function displayPattern() {
 
-        var lights = [document.getElementById("1"), document.getElementById("2"), document.getElementById("3"), document.getElementById("4")];
+        // If we already displayed entire pattern return and display nothing
+        if (this.patternIndex >= this.pattern.length) return;
 
-        console.log(this.state.pattern);
+        // Display next button in the pattern and play associated sound
+        var btnValue = this.pattern[this.patternIndex];
 
-        for (var i = 0; i < pattern.length; ++i) {
+        if (btnValue === 0) this.setState({ forceGreen: true });else if (btnValue === 1) this.setState({ forceRed: true });else if (btnValue === 2) this.setState({ forceYellow: true });else if (btnValue === 3) this.setState({ forceBlue: true });
 
-            lights[pattern[i] - 1].click();
-        }
+        this.sounds[btnValue].play();
     },
 
     resetGame: function resetGame() {
 
-        this.setState({ count: 0 });
-        this.state.pattern = [];
+        this.setState({ count: 1 });
+        this.pattern = [];
+        this.patternIndex = 0;
     },
 
     render: function render() {
@@ -615,14 +664,22 @@ module.exports = React.createClass({
         return React.createElement(
             'div',
             { className: 'bgc' },
-            React.createElement(_GamePiece2.default, { className: 'green-btn', id: '1',
-                power: this.getPower }),
-            React.createElement(_GamePiece2.default, { className: 'red-btn', id: '2',
-                power: this.getPower }),
-            React.createElement(_GamePiece2.default, { className: 'yellow-btn', id: '3',
-                power: this.getPower }),
-            React.createElement(_GamePiece2.default, { className: 'blue-btn', id: '4',
-                power: this.getPower }),
+            React.createElement(_GamePiece2.default, { className: 'green-btn', id: '0',
+                onPress: this.onPress,
+                power: this.getPower,
+                forceDisplay: this.state.forceGreen }),
+            React.createElement(_GamePiece2.default, { className: 'red-btn', id: '1',
+                onPress: this.onPress,
+                power: this.getPower,
+                forceDisplay: this.state.forceRed }),
+            React.createElement(_GamePiece2.default, { className: 'yellow-btn', id: '2',
+                onPress: this.onPress,
+                power: this.getPower,
+                forceDisplay: this.state.forceYellow }),
+            React.createElement(_GamePiece2.default, { className: 'blue-btn', id: '3',
+                onPress: this.onPress,
+                power: this.getPower,
+                forceDisplay: this.state.forceBlue }),
             React.createElement(_GameConsole2.default, {
                 power: this.getPower,
                 strict: this.getStrict,
@@ -860,31 +917,19 @@ module.exports = React.createClass({
     displayName: "exports",
 
 
-    getInitialState: function getInitialState() {
-
-        return {
-            audio: new Audio("https://s3.amazonaws.com/freecodecamp/simonSound" + this.props.id + ".mp3")
-        };
-    },
-
-    onClick: function onClick() {
-
-        if (this.props.power()) {
-
-            var audio = this.state.audio;
-            audio.pause();
-            audio.currentTime = 0;
-            audio.play();
-        }
-    },
-
     render: function render() {
 
         var className = this.props.className;
-        if (this.props.power()) className += "-on";
+        if (this.props.forceDisplay) {
+            className += "-force";
+        } else if (this.props.power()) className += "-on";
 
-        return React.createElement("div", { className: className, id: this.props.id,
-            onClick: this.onClick });
+        return React.createElement(
+            "div",
+            { className: className, id: this.props.id,
+                onMouseDown: this.props.onPress },
+            " "
+        );
     }
 });
 
@@ -989,7 +1034,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, ".game-btn, .green-btn, .green-btn-on, .red-btn, .red-btn-on, .yellow-btn, .yellow-btn-on, .blue-btn, .blue-btn-on {\n  width: 215px;\n  height: 215px;\n  position: inherit; }\n\n.green-btn, .green-btn-on {\n  top: 25px;\n  left: 25px;\n  border-top-left-radius: 100%;\n  background-color: #006600; }\n\n.green-btn-on:active {\n  background-color: #4ca64c;\n  box-shadow: 0px 0px 14px 4px #4ca64c; }\n\n.red-btn, .red-btn-on {\n  top: 25px;\n  right: 25px;\n  border-top-right-radius: 100%;\n  background-color: #cc0000; }\n\n.red-btn-on:active {\n  background-color: #ff4c4c;\n  box-shadow: 0px 0px 14px 4px #ff4c4c; }\n\n.yellow-btn, .yellow-btn-on {\n  bottom: 25px;\n  left: 25px;\n  border-bottom-left-radius: 100%;\n  background-color: #cccc00; }\n\n.yellow-btn-on:active {\n  background-color: #ffff4c;\n  box-shadow: 0px 0px 14px 4px #ffff4c; }\n\n.blue-btn, .blue-btn-on {\n  bottom: 25px;\n  right: 25px;\n  border-bottom-right-radius: 100%;\n  background-color: #0000cc; }\n\n.blue-btn-on:active {\n  background-color: #4c4cff;\n  box-shadow: 0px 0px 14px 4px #4c4cff; }\n", ""]);
+exports.push([module.i, ".game-btn, .green-btn, .green-btn-force, .green-btn-on, .red-btn, .red-btn-force, .red-btn-on, .yellow-btn, .yellow-btn-force, .yellow-btn-on, .blue-btn, .blue-btn-force, .blue-btn-on {\n  width: 215px;\n  height: 215px;\n  position: inherit; }\n\n.green-btn, .green-btn-force, .green-btn-on {\n  top: 25px;\n  left: 25px;\n  border-top-left-radius: 100%;\n  background-color: #006600; }\n\n.green-btn-force {\n  background-color: #4ca64c;\n  box-shadow: 0 0 14px 4px #4ca64c; }\n\n.green-btn-on:active {\n  background-color: #4ca64c;\n  box-shadow: 0 0 14px 4px #4ca64c; }\n\n.red-btn, .red-btn-force, .red-btn-on {\n  top: 25px;\n  right: 25px;\n  border-top-right-radius: 100%;\n  background-color: #cc0000; }\n\n.red-btn-force {\n  background-color: #ff4c4c;\n  box-shadow: 0 0 14px 4px #ff4c4c; }\n\n.red-btn-on:active {\n  background-color: #ff4c4c;\n  box-shadow: 0 0 14px 4px #ff4c4c; }\n\n.yellow-btn, .yellow-btn-force, .yellow-btn-on {\n  bottom: 25px;\n  left: 25px;\n  border-bottom-left-radius: 100%;\n  background-color: #cccc00; }\n\n.yellow-btn-force {\n  background-color: #ffff4c;\n  box-shadow: 0 0 14px 4px #ffff4c; }\n\n.yellow-btn-on:active {\n  background-color: #ffff4c;\n  box-shadow: 0 0 14px 4px #ffff4c; }\n\n.blue-btn, .blue-btn-force, .blue-btn-on {\n  bottom: 25px;\n  right: 25px;\n  border-bottom-right-radius: 100%;\n  background-color: #0000cc; }\n\n.blue-btn-force {\n  background-color: #4c4cff;\n  box-shadow: 0 0 14px 4px #4c4cff; }\n\n.blue-btn-on:active {\n  background-color: #4c4cff;\n  box-shadow: 0 0 14px 4px #4c4cff; }\n", ""]);
 
 // exports
 
