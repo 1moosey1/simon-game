@@ -7,34 +7,10 @@ let audioLink = "https://s3.amazonaws.com/freecodecamp/";
 module.exports = React.createClass({
 
     sounds: [], pattern: [],
-    patternIndex: 0,
+    patternIndex: 0, displayingPattern: false,
+    userIndex: 0,
 
     getInitialState: function() {
-
-        // When displaying a level's pattern, we use a listener
-        // to indicate when a sound has ended and know to play the next
-        let audioListener = function() {
-
-            // Move to the next button to be displayed
-            this.patternIndex++;
-
-            if(this.state.forceGreen)
-                this.setState({forceGreen: false});
-
-            else if(this.state.forceRed)
-                this.setState({forceRed: false});
-
-            else if(this.state.forceYellow)
-                this.setState({forceYellow: false});
-
-            else if(this.state.forceBlue)
-                this.setState({forceBlue: false});
-
-            // Wait 350 milliseconds before displaying next button
-            // Ensures the displayed pattern isn't shown too fast
-            window.setTimeout(this.displayPattern, 350);
-
-        }.bind(this);
 
         // Initialize sounds
         this.sounds = [
@@ -44,17 +20,11 @@ module.exports = React.createClass({
             new Audio(audioLink + "simonSound4.mp3")  // Blue sound effect
         ];
 
-        // Attach listener to each sound
-        this.sounds.forEach((sound)=>{
-            sound.addEventListener("ended", audioListener);
-        });
-
         return {
 
-            power: false, strict: false,
+            power: false, strict: false, count: 0,
             forceGreen: false, forceRed: false,
-            forceYellow: false, forceBlue: false,
-            count: 0
+            forceYellow: false, forceBlue: false
         };
     },
 
@@ -71,12 +41,17 @@ module.exports = React.createClass({
 
         if(this.state.power){
 
-            this.setState({ power: false, strict: false, count: 0 });
+            this.setState({
+
+                power: false, strict: false, count: 0,
+                forceGreen: false, forceRed: false,
+                forceYellow: false, forceBlue: false
+            });
         }
         else {
 
             this.resetGame();
-            this.setState({ power: true, count: 1 }, this.startLevel);
+            this.setState({ power: true }, this.startLevel);
         }
     },
 
@@ -89,47 +64,107 @@ module.exports = React.createClass({
     // Called when the game pieces are pressed
     onPress: function(evtObj) {
 
-        // Only play sounds when power is on
-        if(this.state.power) {
+        // Only play sounds when power is on and not displaying level
+        if(this.state.power && !this.displayingPattern) {
 
-            let id = evtObj.target.id;
-            this.sounds[id].pause();
-            this.sounds[id].currentTime = 0;
-            this.sounds[id].play();
+            let id = parseInt(evtObj.target.id);
+
+            this.playSound(id);
+            this.checkInput(id);
         }
+    },
+
+    // Play a sound with event listener disabled
+    playSound: function(id) {
+
+        this.sounds[id].pause();
+        this.sounds[id].currentTime = 0;
+        this.sounds[id].play();
+    },
+
+    checkInput: function(id) {
+
+        // Check if the user pressed the correct button
+        if(this.pattern[this.userIndex] === id) {
+
+            this.userIndex++;
+
+            // Check if the level is complete
+            if (this.userIndex === this.pattern.length)
+                this.nextLevel();
+        }
+
+        // User pressed wrong button
+        else {
+
+            if(this.state.strict)
+                this.resetGame();
+
+            this.resetLevel();
+        }
+    },
+
+    nextLevel: function() {
+
+        this.setState({ count: ++this.state.count });
+        window.setTimeout(this.startLevel, 1000);
+    },
+
+    resetLevel: function() {
+      window.setTimeout(this.startLevel, 1000);
     },
 
     startLevel: function() {
 
-        let pattern, count, randBtn;
-        pattern = this.pattern;
+        // Generate and add the new button to pattern
+        let randBtn = Math.floor(Math.random() * 4);
+        this.pattern.push(randBtn);
 
-        // Determine how many new random buttons need to be added to level's pattern
-        count = this.getCount() - pattern.length;
-        if (count < 0) {
-
-            pattern = [];
-            count = this.getCount();
-        }
-
-        // Generate and add the new buttons to pattern
-        for(let i = 0; i < count; ++i) {
-
-            randBtn = Math.floor(Math.random() * 4);
-            pattern.push(randBtn);
-        }
-
+        this.userIndex = 0;
+        this.patternIndex = 0;
+        this.displayingPattern = true;
         this.displayPattern();
+    },
+
+    // Prepare next button to be displayed
+    prepareDisplay: function() {
+
+        if(this.state.power && this.displayingPattern) {
+
+            // Stop simulating button press
+            if (this.state.forceGreen)
+                this.setState({forceGreen: false});
+
+            else if (this.state.forceRed)
+                this.setState({forceRed: false});
+
+            else if (this.state.forceYellow)
+                this.setState({forceYellow: false});
+
+            else if (this.state.forceBlue)
+                this.setState({forceBlue: false});
+
+            // Move to the next button to be displayed
+            this.patternIndex++;
+
+            // Check if there is a next button to be displayed
+            if (this.patternIndex < this.pattern.length)
+
+                // Wait 350 milliseconds before displaying next button
+                window.setTimeout(this.displayPattern, 350);
+
+            else {
+
+                this.displayingPattern = false;
+            }
+        }
     },
 
     displayPattern: function () {
 
-        // If we already displayed entire pattern return and display nothing
-        if(this.patternIndex >= this.pattern.length)
-            return;
-
         // Display next button in the pattern and play associated sound
-        let btnValue = this.pattern[this.patternIndex];
+        let btnValue = this.pattern[this.patternIndex],
+        soundDuration = this.sounds[btnValue].duration * 1000;
 
         if(btnValue === 0)
             this.setState({forceGreen: true});
@@ -143,14 +178,16 @@ module.exports = React.createClass({
         else if(btnValue === 3)
             this.setState({forceBlue: true});
 
-        this.sounds[btnValue].play();
+        this.playSound(btnValue);
+
+        console.log(soundDuration);
+        window.setTimeout(this.prepareDisplay, soundDuration);
     },
 
     resetGame: function() {
 
         this.setState({ count: 1 });
         this.pattern = [];
-        this.patternIndex = 0;
     },
 
     render: function() {
