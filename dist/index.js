@@ -534,7 +534,7 @@ module.exports = React.createClass({
 
     sounds: [], pattern: [],
     patternIndex: 0, displayingPattern: false,
-    userIndex: 0,
+    userIndex: 0, count: 0,
 
     getInitialState: function getInitialState() {
 
@@ -547,7 +547,7 @@ module.exports = React.createClass({
 
         return {
 
-            power: false, strict: false, count: 0,
+            power: false, strict: false, displayCount: 0,
             forceGreen: false, forceRed: false,
             forceYellow: false, forceBlue: false
         };
@@ -561,8 +561,8 @@ module.exports = React.createClass({
         return this.state.strict;
     },
 
-    getCount: function getCount() {
-        return this.state.count;
+    getDisplayCount: function getDisplayCount() {
+        return this.state.displayCount;
     },
 
     togglePower: function togglePower() {
@@ -571,7 +571,7 @@ module.exports = React.createClass({
 
             this.setState({
 
-                power: false, strict: false, count: 0,
+                power: false, strict: false, displayCount: 0,
                 forceGreen: false, forceRed: false,
                 forceYellow: false, forceBlue: false
             });
@@ -639,18 +639,24 @@ module.exports = React.createClass({
         var delay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
 
+        this.setState({ displayCount: "!!" });
+
+        this.count++;
         this.expandPattern();
-        this.setState({ count: ++this.state.count });
         window.setTimeout(this.startLevel, delay);
     },
 
     restartLevel: function restartLevel() {
 
         this.displayingPattern = true;
+
+        this.setState({ displayCount: "X" });
         window.setTimeout(this.startLevel, 1000);
     },
 
     startLevel: function startLevel() {
+
+        this.setState({ displayCount: this.count });
 
         this.userIndex = 0;
         this.patternIndex = 0;
@@ -689,7 +695,7 @@ module.exports = React.createClass({
 
     resetGame: function resetGame() {
 
-        this.setState({ count: 1 });
+        this.count = 1;
         this.pattern = [];
         this.expandPattern();
     },
@@ -718,7 +724,7 @@ module.exports = React.createClass({
             React.createElement(_GameConsole2.default, {
                 power: this.getPower,
                 strict: this.getStrict,
-                count: this.getCount,
+                count: this.getDisplayCount,
                 togglePower: this.togglePower,
                 toggleStrict: this.toggleStrict })
         );
