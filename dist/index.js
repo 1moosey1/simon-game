@@ -616,7 +616,7 @@ module.exports = React.createClass({
             this.userIndex++;
 
             // Check if the level is complete
-            if (this.userIndex === this.pattern.length) this.nextLevel();
+            if (this.userIndex === this.pattern.length) this.nextLevel(1000);
         }
 
         // User pressed wrong button
@@ -624,25 +624,33 @@ module.exports = React.createClass({
 
                 if (this.state.strict) this.resetGame();
 
-                this.resetLevel();
+                this.restartLevel();
             }
     },
 
-    nextLevel: function nextLevel() {
-
-        this.setState({ count: ++this.state.count });
-        window.setTimeout(this.startLevel, 1000);
-    },
-
-    resetLevel: function resetLevel() {
-        window.setTimeout(this.startLevel, 1000);
-    },
-
-    startLevel: function startLevel() {
+    expandPattern: function expandPattern() {
 
         // Generate and add the new button to pattern
         var randBtn = Math.floor(Math.random() * 4);
         this.pattern.push(randBtn);
+    },
+
+    nextLevel: function nextLevel() {
+        var delay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+
+        this.expandPattern();
+        this.setState({ count: ++this.state.count });
+        window.setTimeout(this.startLevel, delay);
+    },
+
+    restartLevel: function restartLevel() {
+
+        this.displayingPattern = true;
+        window.setTimeout(this.startLevel, 1000);
+    },
+
+    startLevel: function startLevel() {
 
         this.userIndex = 0;
         this.patternIndex = 0;
@@ -653,23 +661,18 @@ module.exports = React.createClass({
     // Prepare next button to be displayed
     prepareDisplay: function prepareDisplay() {
 
-        if (this.state.power && this.displayingPattern) {
+        // Stop simulating button press
+        if (this.state.forceGreen) this.setState({ forceGreen: false });else if (this.state.forceRed) this.setState({ forceRed: false });else if (this.state.forceYellow) this.setState({ forceYellow: false });else if (this.state.forceBlue) this.setState({ forceBlue: false });
 
-            // Stop simulating button press
-            if (this.state.forceGreen) this.setState({ forceGreen: false });else if (this.state.forceRed) this.setState({ forceRed: false });else if (this.state.forceYellow) this.setState({ forceYellow: false });else if (this.state.forceBlue) this.setState({ forceBlue: false });
+        // Move to the next button to be displayed
+        this.patternIndex++;
 
-            // Move to the next button to be displayed
-            this.patternIndex++;
+        // Check if there is a next button to be displayed
+        if (this.state.power && this.patternIndex < this.pattern.length) {
 
-            // Check if there is a next button to be displayed
-            if (this.patternIndex < this.pattern.length)
-
-                // Wait 350 milliseconds before displaying next button
-                window.setTimeout(this.displayPattern, 350);else {
-
-                this.displayingPattern = false;
-            }
-        }
+            // Wait 350 milliseconds before displaying next button
+            window.setTimeout(this.displayPattern, 350);
+        } else this.displayingPattern = false;
     },
 
     displayPattern: function displayPattern() {
@@ -681,8 +684,6 @@ module.exports = React.createClass({
         if (btnValue === 0) this.setState({ forceGreen: true });else if (btnValue === 1) this.setState({ forceRed: true });else if (btnValue === 2) this.setState({ forceYellow: true });else if (btnValue === 3) this.setState({ forceBlue: true });
 
         this.playSound(btnValue);
-
-        console.log(soundDuration);
         window.setTimeout(this.prepareDisplay, soundDuration);
     },
 
@@ -690,6 +691,7 @@ module.exports = React.createClass({
 
         this.setState({ count: 1 });
         this.pattern = [];
+        this.expandPattern();
     },
 
     render: function render() {
