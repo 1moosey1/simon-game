@@ -7,8 +7,8 @@ let audioLink = "https://s3.amazonaws.com/freecodecamp/";
 module.exports = React.createClass({
 
     sounds: [], pattern: [],
-    patternIndex: 0, displayingPattern: false,
-    userIndex: 0, count: 0,
+    patternIndex: 0, userIndex: 0, count: 0,
+    displayingPattern: false, transitioning: false,
 
     getInitialState: function() {
 
@@ -65,7 +65,7 @@ module.exports = React.createClass({
     onPress: function(evtObj) {
 
         // Only play sounds when power is on and not displaying level
-        if(this.state.power && !this.displayingPattern) {
+        if(this.state.power && !this.displayingPattern && !this.transitioning) {
 
             let id = parseInt(evtObj.target.id);
 
@@ -113,6 +113,7 @@ module.exports = React.createClass({
 
     nextLevel: function(delay = 0) {
 
+        this.transitioning = true;
         this.setState({ displayCount: "!!" });
 
         this.count++;
@@ -122,7 +123,7 @@ module.exports = React.createClass({
 
     restartLevel: function() {
 
-        this.displayingPattern = true;
+        this.transitioning = true;
 
         this.setState({ displayCount: "X" });
         window.setTimeout(this.startLevel, 1000);
@@ -134,6 +135,8 @@ module.exports = React.createClass({
 
         this.userIndex = 0;
         this.patternIndex = 0;
+
+        this.transitioning = false;
         this.displayingPattern = true;
         this.displayPattern();
     },
@@ -222,9 +225,9 @@ module.exports = React.createClass({
                            forceDisplay={this.state.forceBlue} />
 
                 <Console
-                    power={this.getPower}
-                    strict={this.getStrict}
-                    count={this.getDisplayCount}
+                    getPower={this.getPower}
+                    getStrict={this.getStrict}
+                    getDisplayCount={this.getDisplayCount}
                     togglePower={this.togglePower}
                     toggleStrict={this.toggleStrict} />
 

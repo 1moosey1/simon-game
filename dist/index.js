@@ -533,8 +533,8 @@ module.exports = React.createClass({
 
 
     sounds: [], pattern: [],
-    patternIndex: 0, displayingPattern: false,
-    userIndex: 0, count: 0,
+    patternIndex: 0, userIndex: 0, count: 0,
+    displayingPattern: false, transitioning: false,
 
     getInitialState: function getInitialState() {
 
@@ -591,7 +591,7 @@ module.exports = React.createClass({
     onPress: function onPress(evtObj) {
 
         // Only play sounds when power is on and not displaying level
-        if (this.state.power && !this.displayingPattern) {
+        if (this.state.power && !this.displayingPattern && !this.transitioning) {
 
             var id = parseInt(evtObj.target.id);
 
@@ -639,6 +639,7 @@ module.exports = React.createClass({
         var delay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
 
+        this.transitioning = true;
         this.setState({ displayCount: "!!" });
 
         this.count++;
@@ -648,7 +649,7 @@ module.exports = React.createClass({
 
     restartLevel: function restartLevel() {
 
-        this.displayingPattern = true;
+        this.transitioning = true;
 
         this.setState({ displayCount: "X" });
         window.setTimeout(this.startLevel, 1000);
@@ -660,6 +661,8 @@ module.exports = React.createClass({
 
         this.userIndex = 0;
         this.patternIndex = 0;
+
+        this.transitioning = false;
         this.displayingPattern = true;
         this.displayPattern();
     },
@@ -722,9 +725,9 @@ module.exports = React.createClass({
                 power: this.getPower,
                 forceDisplay: this.state.forceBlue }),
             React.createElement(_GameConsole2.default, {
-                power: this.getPower,
-                strict: this.getStrict,
-                count: this.getDisplayCount,
+                getPower: this.getPower,
+                getStrict: this.getStrict,
+                getDisplayCount: this.getDisplayCount,
                 togglePower: this.togglePower,
                 toggleStrict: this.toggleStrict })
         );
@@ -846,11 +849,11 @@ module.exports = React.createClass({
             'div',
             { className: 'fgc' },
             React.createElement(_GameCounter2.default, {
-                power: this.props.power,
-                count: this.props.count }),
+                getPower: this.props.getPower,
+                getDisplayCount: this.props.getDisplayCount }),
             React.createElement(_GameControls2.default, {
-                power: this.props.power,
-                strict: this.props.strict,
+                getPower: this.props.getPower,
+                getStrict: this.props.getStrict,
                 togglePower: this.props.togglePower,
                 toggleStrict: this.props.toggleStrict }),
             React.createElement(_Footer2.default, null)
@@ -874,10 +877,10 @@ module.exports = React.createClass({
     render: function render() {
 
         var powerClass = "switch";
-        if (this.props.power()) powerClass += "-on";
+        if (this.props.getPower()) powerClass += "-on";
 
         var strictClass = "switch";
-        if (this.props.strict()) strictClass += "-on";
+        if (this.props.getStrict()) strictClass += "-on";
 
         return React.createElement(
             "div",
@@ -885,8 +888,12 @@ module.exports = React.createClass({
             React.createElement(
                 "div",
                 { className: "inline" },
-                React.createElement("button", { className: powerClass,
-                    onClick: this.props.togglePower }),
+                React.createElement(
+                    "button",
+                    { className: powerClass,
+                        onClick: this.props.togglePower },
+                    " "
+                ),
                 React.createElement(
                     "div",
                     null,
@@ -896,8 +903,12 @@ module.exports = React.createClass({
             React.createElement(
                 "div",
                 { className: "inline" },
-                React.createElement("button", { className: strictClass,
-                    onClick: this.props.toggleStrict }),
+                React.createElement(
+                    "button",
+                    { className: strictClass,
+                        onClick: this.props.toggleStrict },
+                    " "
+                ),
                 React.createElement(
                     "div",
                     null,
@@ -924,7 +935,7 @@ module.exports = React.createClass({
     render: function render() {
 
         var className = "counter";
-        if (this.props.power()) className += "-on";
+        if (this.props.getPower()) className += "-on";
 
         return React.createElement(
             "div",
@@ -933,7 +944,7 @@ module.exports = React.createClass({
                 "div",
                 { className: className },
                 " ",
-                this.props.count(),
+                this.props.getDisplayCount(),
                 " "
             ),
             React.createElement(

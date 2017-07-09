@@ -11,12 +11,12 @@ module.exports = React.createClass({
             <div className="fgc">
 
                 <Counter
-                    power={this.props.power}
-                    count={this.props.count} />
+                    getPower={this.props.getPower}
+                    getDisplayCount={this.props.getDisplayCount} />
 
                 <Controls
-                    power={this.props.power}
-                    strict={this.props.strict}
+                    getPower={this.props.getPower}
+                    getStrict={this.props.getStrict}
                     togglePower={this.props.togglePower}
                     toggleStrict={this.props.toggleStrict} />
 
